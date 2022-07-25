@@ -4,6 +4,7 @@ from datetime import datetime
 import random
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+import os
 
 bot = commands.Bot(command_prefix="$", description="This is a daily bot")
 
@@ -39,7 +40,7 @@ async def on_ready():
 
     scheduler = AsyncIOScheduler()
 
-    scheduler.add_job(func, CronTrigger(hour=22, minute=9, second=20), args=[])
+    scheduler.add_job(func, CronTrigger(hour=7, minute=0, second=20), args=[])
     scheduler.start()
 
     print("My Ready is Body")
@@ -123,6 +124,7 @@ async def on_message(message):
             await message.channel.send(
                 f"{message.author} sua daily já foi coletada hoje!"
             )
+
 
 # get TOKEN from .env
 bot.run(os.getenv("TOKEN"))
