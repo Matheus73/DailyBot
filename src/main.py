@@ -48,7 +48,7 @@ async def on_ready():
 
 @bot.command()
 async def table(ctx):
-    channel = bot.get_channel(1000926747891601610)
+    channel = bot.get_channel(1001120316229173248)
     await channel.send("@everyone", file=discord.File("table.md"))
     await ctx.send("Enviado!")
 
@@ -103,26 +103,34 @@ async def on_message(message):
         "ontem" in message.content.lower()
         and "hoje" in message.content.lower()
         and "bloqueio" in message.content.lower()
-        and message.channel.id == 1000926747891601610
+        and message.channel.id == 1001120316229173248
     ):
-        if message.author.name not in coleted:
-            splitted_message = [
-                f"{i.split(':')[1]}" for i in message.content.split("\n")
-            ]
+        try:
+            if message.author.name not in coleted:
+                splitted_message = [
+                    f"{i.split(':')[1]}" for i in message.content.split("\n")
+                ]
 
-            # ['Ontem: tal tal', 'Hoje: tal tal tal', 'Bloqueio: nao']
-            line = f"| {names[message.author.name]} | {datetime.today().strftime('%d-%m-%Y')} | {splitted_message[0]} | {splitted_message[1]} | {splitted_message[2]} |"
-            print(line)
-            with open("table.md", "a") as f:
-                f.write(line + "\n")
+                # ['Ontem: tal tal', 'Hoje: tal tal tal', 'Bloqueio: nao']
+                line = f"| {names[message.author.name]} | {datetime.today().strftime('%d-%m-%Y')} | {splitted_message[0]} | {splitted_message[1]} | {splitted_message[2]} |"
+                print(line)
+                with open("table.md", "a") as f:
+                    f.write(line + "\n")
 
-                coleted.append(message.author.name)
+                    coleted.append(message.author.name)
 
-            await message.channel.send(f"Daily de {message.author} coletada!")
-            await bot.process_commands(message)
-        else:
+                await message.channel.send(
+                    f"Daily de {message.author} coletada!"
+                )
+                await bot.process_commands(message)
+            else:
+                await message.channel.send(
+                    f"{message.author} sua daily já foi coletada hoje!"
+                )
+        except Exception as e:
+            print(e)
             await message.channel.send(
-                f"{message.author} sua daily já foi coletada hoje!"
+                f"{message.author} erro ao coletar daily, verifique se o template está correto!"
             )
 
 
