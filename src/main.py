@@ -4,6 +4,7 @@ from datetime import datetime
 import random
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+import os
 
 bot = commands.Bot(command_prefix="$", description="This is a daily bot")
 
@@ -13,13 +14,13 @@ names = {
     "There Is No Hope": "Pedro",
     "SamuelNog": "Samuel",
     "Sayuck": "Roberto",
-    "brun0sk#3553": "Bruno",
-    "davess#2780": "Davi",
-    "Giovanni A.#3341": "Giovanni",
-    "GG#9631": "Guilherme",
-    "nicolas-souza#3761": "Nicolas",
-    "Antogalatic#0160": "Rodrigo",
-    "Caldas#5891": "Algusto",
+    "brun0sk": "Bruno",
+    "davess": "Davi",
+    "Giovanni A.": "Giovanni",
+    "GG": "Guilherme",
+    "nicolas-souza": "Nicolas",
+    "Antogalatic": "Rodrigo",
+    "Caldas": "Algusto",
 }
 
 coleted = []
@@ -28,7 +29,7 @@ coleted = []
 async def func():
     # send message in daily channel
     global coleted
-    channel = bot.get_channel(1000926747891601610)
+    channel = bot.get_channel(1001120316229173248)
     coleted = []
     await channel.send("@everyone Não esqueçam de responder sua Daily hoje!")
 
@@ -39,7 +40,7 @@ async def on_ready():
 
     scheduler = AsyncIOScheduler()
 
-    scheduler.add_job(func, CronTrigger(hour=22, minute=9, second=20), args=[])
+    scheduler.add_job(func, CronTrigger(hour=7, minute=0, second=20), args=[])
     scheduler.start()
 
     print("My Ready is Body")
@@ -47,7 +48,7 @@ async def on_ready():
 
 @bot.command()
 async def table(ctx):
-    channel = bot.get_channel(1000926747891601610)
+    channel = bot.get_channel(1001120316229173248)
     await channel.send("@everyone", file=discord.File("table.md"))
     await ctx.send("Enviado!")
 
@@ -102,27 +103,36 @@ async def on_message(message):
         "ontem" in message.content.lower()
         and "hoje" in message.content.lower()
         and "bloqueio" in message.content.lower()
-        and message.channel.id == 1000926747891601610
+        and message.channel.id == 1001120316229173248
     ):
-        if message.author.name not in coleted:
-            splitted_message = [
-                f"{i.split(':')[1]}" for i in message.content.split("\n")
-            ]
+        try:
+            if message.author.name not in coleted:
+                splitted_message = [
+                    f"{i.split(':')[1]}" for i in message.content.split("\n")
+                ]
 
-            # ['Ontem: tal tal', 'Hoje: tal tal tal', 'Bloqueio: nao']
-            line = f"| {names[message.author.name]} | {datetime.today().strftime('%d-%m-%Y')} | {splitted_message[0]} | {splitted_message[1]} | {splitted_message[2]} |"
-            print(line)
-            with open("table.md", "a") as f:
-                f.write(line + "\n")
+                # ['Ontem: tal tal', 'Hoje: tal tal tal', 'Bloqueio: nao']
+                line = f"| {names[message.author.name]} | {datetime.today().strftime('%d-%m-%Y')} | {splitted_message[0]} | {splitted_message[1]} | {splitted_message[2]} |"
+                print(line)
+                with open("table.md", "a") as f:
+                    f.write(line + "\n")
 
-                coleted.append(message.author.name)
+                    coleted.append(message.author.name)
 
-            await message.channel.send(f"Daily de {message.author} coletada!")
-            await bot.process_commands(message)
-        else:
+                await message.channel.send(
+                    f"Daily de {message.author} coletada!"
+                )
+                await bot.process_commands(message)
+            else:
+                await message.channel.send(
+                    f"{message.author} sua daily já foi coletada hoje!"
+                )
+        except Exception as e:
+            print(e)
             await message.channel.send(
-                f"{message.author} sua daily já foi coletada hoje!"
+                f"{message.author} erro ao coletar daily, tente novamente!"
             )
+
 
 # get TOKEN from .env
 bot.run(os.getenv("TOKEN"))
