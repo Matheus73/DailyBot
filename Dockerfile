@@ -4,8 +4,6 @@ ENV TZ=America/Sao_Paulo
 
 WORKDIR /home
 
-ENV TOKEN=value
-
 COPY requirements.txt .
 
 RUN pip install -r requirements.txt

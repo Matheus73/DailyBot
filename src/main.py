@@ -5,6 +5,8 @@ import random
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 import os
+import requests
+import json
 
 bot = commands.Bot(command_prefix="$", description="This is a daily bot")
 
@@ -93,6 +95,29 @@ async def xingue(ctx, message: str):
         "bosta",
     ]
     await ctx.send(f"O {message} é um {random.choice(insultos)}!")
+
+@bot.command()
+async def carros(ctx):
+    # print(f"message: {message}")
+
+    # make a get request to the API
+    response = requests.get("http://140.238.191.18:5000/carro")
+    text_data = "".join([str(x)+"\n" for x in response.json()])
+    await ctx.send(text_data)
+
+@bot.command()
+async def registra(ctx, message: str):
+    print(f"placa: {message}")
+    headers = {
+    "Content-Type": "application/json"
+    }
+    message = message.upper()
+    # make a post request to the API
+    response = requests.post("http://140.238.191.18:5000/estaciona", 
+    json={"placa": message}, 
+    headers=headers)
+    text_data = response.json().get("message")
+    await ctx.send(text_data)
 
 
 @bot.listen()
